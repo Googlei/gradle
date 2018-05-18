@@ -47,6 +47,8 @@ import org.gradle.cache.PersistentIndexedCache;
 import org.gradle.cache.internal.CacheRepositoryServices;
 import org.gradle.cache.internal.CacheScopeMapping;
 import org.gradle.cache.internal.CrossBuildInMemoryCacheFactory;
+import org.gradle.cache.internal.DefaultGeneratedGradleJarCache;
+import org.gradle.cache.internal.GeneratedGradleJarCache;
 import org.gradle.groovy.scripts.internal.CrossBuildInMemoryCachingScriptClassCache;
 import org.gradle.groovy.scripts.internal.DefaultScriptSourceHasher;
 import org.gradle.groovy.scripts.internal.RegistryAwareClassLoaderHierarchyHasher;
@@ -82,6 +84,7 @@ import org.gradle.process.internal.health.memory.MemoryManager;
 import org.gradle.process.internal.worker.DefaultWorkerProcessFactory;
 import org.gradle.process.internal.worker.WorkerProcessFactory;
 import org.gradle.process.internal.worker.child.WorkerProcessClassPathProvider;
+import org.gradle.util.GradleVersion;
 
 import java.util.List;
 
@@ -196,5 +199,10 @@ public class GradleUserHomeScopeServices {
 
     WorkerProcessClassPathProvider createWorkerProcessClassPathProvider(CacheRepository cacheRepository) {
         return new WorkerProcessClassPathProvider(cacheRepository);
+    }
+
+    GeneratedGradleJarCache createGeneratedGradleJarCache(CacheRepository cacheRepository) {
+        String gradleVersion = GradleVersion.current().getVersion();
+        return new DefaultGeneratedGradleJarCache(cacheRepository, gradleVersion);
     }
 }
