@@ -218,6 +218,12 @@ public class XCTestConventionPlugin implements Plugin<ProjectInternal> {
                 }
             }));
 
+            // TODO - make this lazy
+            final DefaultNativePlatform currentPlatform = new DefaultNativePlatform("current");
+            final ModelRegistry modelRegistry = ((ProjectInternal)project).getModelRegistry();
+            final NativeToolChain toolChain = modelRegistry.realize("toolChains", NativeToolChainRegistryInternal.class).getForPlatform(currentPlatform);
+            final PlatformToolProvider toolProvider = ((NativeToolChainInternal) toolChain).select(currentPlatform);
+
             // TODO - creating a bundle should be done by some general purpose plugin
             // Add a link task
             final TaskProvider<LinkMachOBundle> link = tasks.createLater(names.getTaskName("link"), LinkMachOBundle.class, new Action<LinkMachOBundle>() {
@@ -225,12 +231,6 @@ public class XCTestConventionPlugin implements Plugin<ProjectInternal> {
                 public void execute(LinkMachOBundle link) {
                     link.source(binary.getObjects());
                     link.lib(binary.getLinkLibraries());
-
-                    // TODO - make this lazy
-                    DefaultNativePlatform currentPlatform = new DefaultNativePlatform("current");
-                    final ModelRegistry modelRegistry = ((ProjectInternal)project).getModelRegistry();
-                    NativeToolChain toolChain = modelRegistry.realize("toolChains", NativeToolChainRegistryInternal.class).getForPlatform(currentPlatform);
-                    final PlatformToolProvider toolProvider = ((NativeToolChainInternal) toolChain).select(currentPlatform);
 
                     Provider<RegularFile> exeLocation = project.getLayout().getBuildDirectory().file(project.getProviders().provider(new Callable<String>() {
                         @Override
